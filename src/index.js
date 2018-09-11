@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-const five = require('five');
+const five = require('johnny-five');
 const Raspi = require('raspi-io');
 const prompts = require('prompts');
 
@@ -42,19 +42,20 @@ async function test1() {
   const led = new five.Led(LED_PIN);
   led.blink();
 
-  const response = await prompts({
+  return await prompts({
     type: 'confirm',
-    value: 'ledBlinked',
+    name: 'passed',
     message: `Is the LED connected to pin ${LED_PIN} blinking?`,
     initial: false
   });
-
-  if (!response.ledBlinked) {
-    console.error('Please run the test again to ensure the LED is blinking before proceeding');
-  }
 }
 
-board.on('ready', () => {
+board.on('ready', async function() {
   console.log('Running tests');
-  test1();
+  const response = await test1();
+  if (!response.passed) {
+    process.exit(-1);
+  }
+  console.log('Tests complete');
+  process.exit(0);
 });
