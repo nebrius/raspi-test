@@ -1,9 +1,5 @@
-# Raspi Test
-
-A sample project for testing out Raspi IO on-device. Like a manual integration test, but a complete project.
-
-# License
-
+#!/usr/bin/env node
+/*
 MIT License
 
 Copyright (c) 2018 Bryan Hughes <bryan@nebri.us>
@@ -25,3 +21,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+const five = require('five');
+const Raspi = require('raspi-io');
+const prompts = require('prompts');
+
+const board = new five.Board({
+  io: new Raspi({
+    enableSoftPwm: true
+  })
+});
+
+const LED_PIN = 'P1-7';
+const PWM_PIN = 'P1-12';
+const SOFT_PWM_PIN = 'P1-11';
+
+async function test1() {
+  console.log(`Blinking LED on pin ${LED_PIN}`);
+  const led = new five.Led(LED_PIN);
+  led.blink();
+
+  const response = await prompts({
+    type: 'confirm',
+    value: 'ledBlinked',
+    message: `Is the LED connected to pin ${LED_PIN} blinking?`,
+    initial: false
+  });
+
+  if (!response.ledBlinked) {
+    console.error('Please run the test again to ensure the LED is blinking before proceeding');
+  }
+}
+
+board.on('ready', () => {
+  console.log('Running tests');
+  test1();
+});

@@ -1,0 +1,24 @@
+{
+  "name": "raspi-test",
+  "version": "1.0.0",
+  "description": "A sample project for testing out Raspi IO on-device. Like a manual integration test, but a complete project.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nebrius/raspi-test.git"
+  },
+  "author": "Bryan Hughes <bryan@nebri.us>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nebrius/raspi-test/issues"
+  },
+  "homepage": "https://github.com/nebrius/raspi-test#readme",
+  "dependencies": {
+    "johnny-five": "^1.0.0",
+    "raspi-io": "^9.0.0",
+    "prompts": "^1.1.0"
+  }
+}
