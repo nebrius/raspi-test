@@ -37,24 +37,90 @@ const LED_PIN = 'P1-7';
 const PWM_PIN = 'P1-12';
 const SOFT_PWM_PIN = 'P1-11';
 
-async function test1() {
-  console.log(`Blinking LED on pin ${LED_PIN}`);
-  const led = new five.Led(LED_PIN);
-  led.blink();
-
-  return await prompts({
+async function prompt(message) {
+  const response = await prompts({
     type: 'confirm',
     name: 'passed',
-    message: `Is the LED connected to pin ${LED_PIN} blinking?`,
-    initial: false
+    message,
+    initial: true
   });
+  if (!response.passed) {
+    process.exit(-1);
+  }
+}
+
+async function ledBlink() {
+  console.log(`Blinking LED on pin ${LED_PIN}`);
+  const led = new five.Led(LED_PIN);
+
+  led.blink();
+  await prompt(`Is the LED connected to pin ${LED_PIN} blinking?`);
+}
+
+async function pwmTest() {
+  console.log(`Testing range of PWM on pin ${PWM_PIN}`);
+  const led = new five.Led(PWM_PIN);
+
+  led.brightness(0);
+  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 0%?`);
+
+  led.brightness(64);
+  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 25%?`);
+
+  led.brightness(128);
+  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 50%?`);
+
+  led.brightness(196);
+  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 75%?`);
+
+  led.brightness(255);
+  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 100%?`);
+}
+
+async function softPwmTest() {
+  console.log(`Testing range of PWM on pin ${SOFT_PWM_PIN}`);
+  const led = new five.Led(SOFT_PWM_PIN);
+
+  led.brightness(0);
+  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 0%?`);
+
+  led.brightness(64);
+  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 25%?`);
+
+  led.brightness(128);
+  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 50%?`);
+
+  led.brightness(196);
+  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 75%?`);
+
+  led.brightness(255);
+  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 100%?`);
+}
+
+async function gpsTest() {
+
+}
+
+async function lcdTest() {
+
+}
+
+async function temperatureTest() {
+
 }
 
 board.on('ready', async function() {
+  const tests = [
+    ledBlink,
+    pwmTest,
+    softPwmTest,
+    gpsTest,
+    lcdTest,
+    temperatureTest
+  ];
   console.log('Running tests');
-  const response = await test1();
-  if (!response.passed) {
-    process.exit(-1);
+  for (const test of tests) {
+    await test();
   }
   console.log('Tests complete');
   process.exit(0);
