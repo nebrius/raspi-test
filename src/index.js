@@ -55,6 +55,9 @@ async function ledBlink() {
 
   led.blink();
   await prompt(`Is the LED connected to pin ${LED_PIN} blinking?`);
+
+  led.stop();
+  led.off();
 }
 
 async function pwmTest() {
@@ -75,6 +78,9 @@ async function pwmTest() {
 
   led.brightness(255);
   await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 100%?`);
+
+  led.stop();
+  led.off();
 }
 
 async function softPwmTest() {
@@ -95,6 +101,9 @@ async function softPwmTest() {
 
   led.brightness(255);
   await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 100%?`);
+
+  led.stop();
+  led.off();
 }
 
 async function gpsTest() {
