@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/nebrius/raspi-test#readme",
   "dependencies": {
+    "core-io": "^3.0.0",
     "johnny-five": "^1.0.0",
-    "raspi-io": "^9.0.0",
-    "prompts": "^1.1.0"
+    "raspi-io": "^10.0.0",
+    "prompts": "^2.0.1",
+    "oled-js": "^5.0.0",
+    "oled-font-5x7": "^1.0.3"
   }
 }

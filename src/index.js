@@ -24,18 +24,18 @@ SOFTWARE.
 */
 
 const five = require('johnny-five');
-const Raspi = require('raspi-io');
+const { RaspiIO } = require('raspi-io');
 const prompts = require('prompts');
+const Oled = require('oled-js');
+const font = require('oled-font-5x7');
 
 const board = new five.Board({
-  io: new Raspi({
-    enableSoftPwm: true
-  })
+  io: new RaspiIO()
 });
 
-const LED_PIN = 'P1-7';
-const PWM_PIN = 'P1-12';
-const SOFT_PWM_PIN = 'P1-11';
+const LED_PIN = 'GPIO18';
+const BUTTON_PIN = 'GPIO20';
+const PWM_PIN = 'GPIO18';
 
 async function prompt(message) {
   const response = await prompts({
@@ -51,13 +51,31 @@ async function prompt(message) {
 
 async function ledBlink() {
   console.log(`Blinking LED on pin ${LED_PIN}`);
-  const led = new five.Led(LED_PIN);
+  const led = new five.Pin({
+    pin: LED_PIN,
+    type: 'digital'
+  });
 
-  led.blink();
+  let value = 0;
+  const interval = setInterval(() => {
+    value = value ? 0 : 1;
+    led.write(value);
+  }, 500);
   await prompt(`Is the LED connected to pin ${LED_PIN} blinking?`);
+  clearInterval(interval);
+  led.write(0);
 
-  led.stop();
-  led.off();
+}
+
+async function buttonClick() {
+  console.log(`Blinking LED on pin ${LED_PIN}`);
+  const button = new five.Button(BUTTON_PIN);
+
+  button.on('press', () => {
+    console.log('Button pressed!');
+  });
+
+  await prompt(`Did pressing the button connected to pin ${LED_PIN} print a message to the console?`);
 }
 
 async function pwmTest() {
@@ -83,47 +101,42 @@ async function pwmTest() {
   led.off();
 }
 
-async function softPwmTest() {
-  console.log(`Testing range of PWM on pin ${SOFT_PWM_PIN}`);
-  const led = new five.Led(SOFT_PWM_PIN);
-
-  led.brightness(0);
-  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 0%?`);
-
-  led.brightness(64);
-  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 25%?`);
-
-  led.brightness(128);
-  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 50%?`);
-
-  led.brightness(196);
-  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 75%?`);
-
-  led.brightness(255);
-  await prompt(`Does the Software PWM signal on pin ${SOFT_PWM_PIN} have a duty cycle of 100%?`);
-
-  led.stop();
-  led.off();
-}
-
 async function gpsTest() {
 
 }
 
 async function lcdTest() {
+  console.log('Testing LCD screen over I2C');
 
+  const oled = new Oled(board, five, {
+    width: 128,
+    height: 64,
+    address: 0x3C
+  });
+  oled.setCursor(1, 1);
+  const message = 'Cats and dogs are really cool animals, you know.';
+  oled.writeString(font, 1, message, 1, true, 2);
+  await prompt(`Do you see the text "${message}" on the screen?`);
 }
 
 async function temperatureTest() {
+  const thermometer = new five.Thermometer({
+    controller: 'MCP9808'
+  });
 
+  thermometer.on('change', () => {
+    console.log(`Temperature: ${thermometer.F} F`);
+  });
+
+  await prompt(`Do you see the tem from the sensor printed on the screen?`);
 }
 
 board.on('ready', async function() {
   const tests = [
     ledBlink,
+    buttonClick,
     pwmTest,
-    softPwmTest,
-    gpsTest,
+    // gpsTest,
     lcdTest,
     temperatureTest
   ];
