@@ -102,7 +102,15 @@ async function pwmTest() {
 }
 
 async function gpsTest() {
+  const gps = new five.GPS({
+    port: board.io.SERIAL_PORT_IDs.DEFAULT
+  });
 
+  gps.on('change', () => {
+    console.log(`position: ${gps.latitude} ${gps.longitude}`);
+  });
+
+  await prompt(`Do you see the GPS heading from the sensor printed on the screen?`);
 }
 
 async function lcdTest() {
@@ -128,17 +136,17 @@ async function temperatureTest() {
     console.log(`Temperature: ${thermometer.F} F`);
   });
 
-  await prompt(`Do you see the tem from the sensor printed on the screen?`);
+  await prompt(`Do you see the temperature from the sensor printed on the screen?`);
 }
 
 board.on('ready', async function() {
   const tests = [
-    ledBlink,
-    buttonClick,
-    pwmTest,
-    // gpsTest,
-    lcdTest,
-    temperatureTest
+    // ledBlink,
+    // buttonClick,
+    // pwmTest,
+    gpsTest,
+    // lcdTest,
+    // temperatureTest
   ];
   console.log('Running tests');
   for (const test of tests) {

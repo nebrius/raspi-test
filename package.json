@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/nebrius/raspi-test#readme",
   "dependencies": {
-    "core-io": "^3.0.0",
     "johnny-five": "^1.0.0",
     "raspi-io": "^10.0.0",
     "prompts": "^2.0.1",
