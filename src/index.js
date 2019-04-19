@@ -35,7 +35,7 @@ const board = new five.Board({
 
 const LED_PIN = 'GPIO18';
 const BUTTON_PIN = 'GPIO20';
-const PWM_PIN = 'GPIO18';
+const PWM_PINS = [ 'GPIO18', 'GPIO25' ];
 
 async function prompt(message) {
   const response = await prompts({
@@ -79,26 +79,28 @@ async function buttonClick() {
 }
 
 async function pwmTest() {
-  console.log(`Testing range of PWM on pin ${PWM_PIN}`);
-  const led = new five.Led(PWM_PIN);
+  for (const pin of PWM_PINS) {
+    console.log(`Testing range of PWM on pin ${pin}`);
+    const led = new five.Led(pin);
 
-  led.brightness(0);
-  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 0%?`);
+    led.brightness(0);
+    await prompt(`Does the PWM signal on pin ${pin} have a duty cycle of 0%?`);
 
-  led.brightness(64);
-  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 25%?`);
+    led.brightness(64);
+    await prompt(`Does the PWM signal on pin ${pin} have a duty cycle of 25%?`);
 
-  led.brightness(128);
-  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 50%?`);
+    led.brightness(128);
+    await prompt(`Does the PWM signal on pin ${pin} have a duty cycle of 50%?`);
 
-  led.brightness(196);
-  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 75%?`);
+    led.brightness(196);
+    await prompt(`Does the PWM signal on pin ${pin} have a duty cycle of 75%?`);
 
-  led.brightness(255);
-  await prompt(`Does the PWM signal on pin ${PWM_PIN} have a duty cycle of 100%?`);
+    led.brightness(255);
+    await prompt(`Does the PWM signal on pin ${pin} have a duty cycle of 100%?`);
 
-  led.stop();
-  led.off();
+    led.stop();
+    led.off();
+  }
 }
 
 async function gpsTest() {
@@ -141,12 +143,12 @@ async function temperatureTest() {
 
 board.on('ready', async function() {
   const tests = [
-    // ledBlink,
-    // buttonClick,
-    // pwmTest,
+    ledBlink,
+    buttonClick,
+    pwmTest,
     gpsTest,
-    // lcdTest,
-    // temperatureTest
+    lcdTest,
+    temperatureTest
   ];
   console.log('Running tests');
   for (const test of tests) {
